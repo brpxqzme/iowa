@@ -1,0 +1,24 @@
+CS 425 Project 3
+
+Sam Himes
+Alfie Parthum
+
+1. Overview of game:
+
+2. Division of responsibilities:
+
+3. Use of procedural content generation:
+
+This game is capable of generating a large number of star systems and planets.
+It is possible to travel to these places. All of them have names, sizes, etc.
+and are (for all practical purposes) unique.
+
+4. Other technical components implemented in this game:
+
+5. Required technique implemented:
+
+6. Is this game modeled after an existing game?
+
+In some ways, this is modeled after some of the space-travel and trading games
+in the vein of Elite, but neither teammate has intense experience with any of
+these in particular.
