@@ -81,7 +81,7 @@ function setActiveHDR(location) {
 	//Update the skybox image...
 	var skybox = new THREE.Mesh( new THREE.CubeGeometry( 4096, 4096, 4096 ), material );
 	skybox.flipSided = true;
-	addToScene(skybox,"skybox");
+	//addToScene(skybox,"skybox");
 }
 
 function camPos(x,y,z) { camera.position.set(x,y,z); }
@@ -95,7 +95,7 @@ function renderSetup() {
 	renderer.setSize(window.innerWidth, window.innerHeight);
 	document.body.appendChild(renderer.domElement);
 
-	camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 20000);
+	camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 40000);
     camera.position.set(0,20,-10);
 	addToScene(camera,"camera");
 }

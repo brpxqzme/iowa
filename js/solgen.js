@@ -77,13 +77,14 @@ function makeStar (id, rng) {
     var color = new THREE.Color();
     color.setRGB(0.8 + rng.randFlt()*0.2, 0.9, 0.8 + rng.randFlt()*0.2);
     // based on size of sun in km + wild guess at attractive stdev.
-    var radius = rng.randGauss(700000, 50000);
+    //var radius = rng.randGauss(700000, 50000);
+	var radius = rng.randGauss(2000, 142);
 
     var name = getName(id);
 
     // generate planets
     var planetids = [];
-    var nplanets = rng.randInt()%3+2;
+	var nplanets = rng.randInt()%5+2;
     var outerorbit = radius*2;
     for (var i = 0; i < nplanets; ++i) {
         // generate id and planet
@@ -110,10 +111,15 @@ function makePlanet (id, rng) {
     var color = new THREE.Color();
     color.setRGB(rng.randFlt(), rng.randFlt(), 0.8 + rng.randFlt()*0.2);
     // well, an earthlike planet at least
-    var radius = rng.randGauss(6371, 600);
+    //var radius = rng.randGauss(6371, 600);
+	var radius = rng.randGauss(200, 20);
     // compressed space... probably needs adjustment for aesthetics
-    var orbit = rng.randGauss(300000, 10000);
+    //var orbit = rng.randGauss(300000, 10000);
+	 var orbit = rng.randGauss(4250, 145);
     // add orientation (in revolution) and speed of revolution as desired
+	
+	var startingPosition = rng.randFlt();
+	var position = new THREE.Vector3(Math.sin(startingPosition),0,Math.cos(startingPosition));
     var orientation = null;
     var revspeed = null;
     return { name: name,
@@ -121,5 +127,6 @@ function makePlanet (id, rng) {
              radius: radius,
              orbit: orbit,
              orientation: orientation,
-             revspeed: revspeed };
+             revspeed: revspeed,
+			 position: position };
 }

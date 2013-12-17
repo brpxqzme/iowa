@@ -1,6 +1,6 @@
 var shipViewToggle = [true,1.0];
-var totalDist = new THREE.Vector3(0,0,0);
-var traveling = false;
+var travelling = false;
+var goalObject = "planet0";
 
 var shipPhys = 
 {
@@ -15,6 +15,7 @@ var shipPhys =
 var camPhys = 
 {
 	maxThrust: 0.25, //can be adjusted when we have upgradable ships.
+	maxVel: 6,
 	velocity: new THREE.Vector3(0,0,0),
 	acceleration: new THREE.Vector3(0,0,0),
 	force: new THREE.Vector3(0,0,0),
@@ -33,12 +34,23 @@ function solve() {
 	camUpdate();
 }
 
+function travelTo(object,pointInSpace) {
+	
+	//You can travel to an arbitrary point in space.  Why not?
+	if (pointInSpace) {
+		moveTo("goal",object.x,object.y,object.z);
+		goalObject = "goal";
+	}
+	else {
+		goalObject = object;
+	}
+}
+
 
 function shipPathing(toWhere,radius) {
 	var ship = grabObject("spaceship")[1];
 		
 	var dist = toWhere.clone().sub(ship.position);
-	//dist.normalize();
 	while (dist.length() > shipPhys.maxThrust) {
 		dist.multiplyScalar(0.975);
 	}
@@ -80,9 +92,9 @@ function cameraPathing() {
 	lhs3 = new THREE.Vector3(0,5,5); //top
 	//------------------------------------------------------------
 	//View from back side.
-	mhs1 = new THREE.Vector3(-25,20,-35); //bl
-	mhs2 = new THREE.Vector3(25,20,-35); //br
-	mhs3 = new THREE.Vector3(0,20,10);  //top
+	mhs1 = new THREE.Vector3(-25,-5,-35); //bl
+	mhs2 = new THREE.Vector3(25,-5,-35); //br
+	mhs3 = new THREE.Vector3(0,-5,10);  //top
 	//------------------------------------------------------------
 	//Find which views to interpolate...
 	
@@ -155,36 +167,58 @@ function cameraPathing() {
 function shipUpdate() {	
 
 	var ship = grabObject("spaceship");
-	var goal = grabObject("goal")[1].position;
-	if (ship[0] && traveling)
-	{
-		//Update target position...
-		
-		//Prevent wonky angle rotation when objects are on top of each other...
-		if (goal.clone().sub(ship[1].position).length() < 8) return;
-		shipPhys.acceleration = getPlanetForces(ship[1]);
-		shipPhys.acceleration.add(shipPathing(goal,totalDist.length()/10));
-		shipPhys.velocity.add(shipPhys.acceleration);
-		
-		while (shipPhys.velocity.length() > shipPhys.maxVel) { shipPhys.velocity.multiplyScalar(0.98); }
-		
-		ship[1].position = ship[1].position.add(shipPhys.velocity);
-		if (shipPhys.acceleration.length() < 0.005 && shipPhys.velocity.length() < 0.005) return;
-		var tquat = ship[1].quaternion.clone();
-		ship[1].lookAt(ship[1].position.clone().add(shipPhys.velocity).add(shipPhys.acceleration.multiplyScalar(48.0)));
-		
-		ship[1].quaternion.slerp(tquat,0.925);
-		//ship[1].quaternion.slerp(tquat,0.970988-14.5258*shipPhys.maxThrust);
-		
-		
-		console.log(goal.clone().sub(ship[1].position).length());
+	var goal = grabObject(goalObject);
+	if (!goal[0] || !ship[0]) return;
+	
+	var sizeOfShip = 32;
+	
+	var radius = sizeOfShip;
+	if (goalObject.indexOf("planet") != -1) {
+		radius += scenePlanets[goalObject].radius;
 	}
+	
+	ship = ship[1];
+	goal = goal[1];
+	
+	//Prevent wonky angle rotation when objects are on top of each other...
+	if (goal.position.clone().sub(ship.position).length() < radius) return;
+	
+	//If the ship is not travelling, let it come to a stop.
+	if (!travelling) { 
+		var vel_len = shipPhys.velocity.length();
+		if (vel_len == 0.0) {}
+		else if (vel_len > 0.1) {
+			shipPhys.velocity.multiplyScalar(0.5);
+		}
+		else {
+			shipPhys.velocity.multiplyScalar(0);
+		}
+		ship.position = ship.position.add(shipPhys.velocity);
+		return;
+	}
+	
+	shipPhys.acceleration = shipPathing(goal.position,radius+512);
+	shipPhys.velocity.add(shipPhys.acceleration);
+
+	while (shipPhys.velocity.length() > shipPhys.maxVel) { shipPhys.velocity.multiplyScalar(0.98); }
+	
+	//shipPhys.acceleration = getPlanetForces(ship[1]);
+
+	
+	ship.position = ship.position.add(shipPhys.velocity);
+	if (shipPhys.acceleration.length() < 0.005 && shipPhys.velocity.length() < 0.005) return;
+	var tquat = ship.quaternion.clone();
+	ship.lookAt(ship.position.clone().add(shipPhys.velocity).add(shipPhys.acceleration.multiplyScalar(48.0)));
+	
+	ship.quaternion.slerp(tquat,0.925);
+	//ship[1].quaternion.slerp(tquat,0.970988-14.5258*shipPhys.maxThrust);
 }
 
 function camUpdate() {
 	
 	camPhys.acceleration = cameraPathing(16);
 	camPhys.velocity.add(camPhys.acceleration);
+	
 	camera.position = camera.position.add(camPhys.velocity);
 	camera.lookAt(grabObject("spaceship")[1].position);
 
