@@ -94,7 +94,7 @@ function renderSetup() {
 	renderer = new THREE.WebGLRenderer({antialias:true});
     var SCREEN_WIDTH = window.innerWidth,
         SCREEN_HEIGHT = window.innerHeight,
-        ASPECT = SCREEN_WIDTH / SCREEN_HEIGHT;
+        ASPECT = (SCREEN_WIDTH * 5/6) / SCREEN_HEIGHT;
 	renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
 	document.getElementById("ThreeJS").appendChild(renderer.domElement);
 

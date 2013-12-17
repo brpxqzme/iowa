@@ -74,7 +74,24 @@ function animate() {
 	
 	requestAnimationFrame(animate);
 
-	// Render the scene.
+    // some people have HiDPI displays. WE LIVE IN THE FUTURE
+    var pixelaspect = window.devicePixelRatio;
+    if (typeof pixelaspect === "undefined") pixelaspect = 1;
+    var PIXELS_WIDTH = window.innerWidth * pixelaspect,
+        PIXELS_HEIGHT = window.innerHeight * pixelaspect,
+        MAIN_WIDTH = Math.floor(5/6 * PIXELS_WIDTH),
+        TEXT_WIDTH = PIXELS_WIDTH - MAIN_WIDTH;
+        TEXT_HEIGHT = Math.floor(PIXELS_HEIGHT * 0.5);
+
+	// Main scene renderer.
+    renderer.setViewport(0, 0, MAIN_WIDTH, PIXELS_HEIGHT);
 	renderer.render( scene, camera );
+
+    // Minimap placeholder
+    renderer.setViewport(MAIN_WIDTH + 1, 0, TEXT_WIDTH, TEXT_HEIGHT);
+
+    // Minimap placeholder
+    renderer.setViewport(MAIN_WIDTH + 1, TEXT_HEIGHT+1,
+                         TEXT_WIDTH, PIXELS_HEIGHT - TEXT_HEIGHT);
 	//controls.update();
 }
