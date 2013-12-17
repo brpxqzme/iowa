@@ -92,10 +92,13 @@ function camTarget(x,y,z) { camera.position.set(x,y,z); }
 function renderSetup() {
 	// Create a renderer
 	renderer = new THREE.WebGLRenderer({antialias:true});
-	renderer.setSize(window.innerWidth, window.innerHeight);
-	document.body.appendChild(renderer.domElement);
+    var SCREEN_WIDTH = window.innerWidth,
+        SCREEN_HEIGHT = window.innerHeight,
+        ASPECT = SCREEN_WIDTH / SCREEN_HEIGHT;
+	renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
+	document.getElementById("ThreeJS").appendChild(renderer.domElement);
 
-	camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 40000);
+	camera = new THREE.PerspectiveCamera(45, ASPECT, 0.1, 40000);
     camera.position.set(0,20,-10);
 	addToScene(camera,"camera");
 }

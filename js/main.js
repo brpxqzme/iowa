@@ -19,11 +19,23 @@ function addKeyboardEvents() {
 
 }
 
+function addResizeEvent () {
+    addEvent(window, "resize", function () {
+        var SCREEN_WIDTH = window.innerWidth,
+            SCREEN_HEIGHT = window.innerHeight,
+            ASPECT = SCREEN_WIDTH / SCREEN_HEIGHT;
+        renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
+        camera.aspect = SCREEN_WIDTH / SCREEN_HEIGHT;
+        camera.updateProjectionMatrix();
+    });
+}
+
 (function() {
   var run;
 
   run = function() {
 	addKeyboardEvents();
+    addResizeEvent();
     init();
     return animate();
   };
