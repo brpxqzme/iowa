@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<title>Test Game</title>
+		<meta charset="utf-8">
+		
+		<!-- Backend Mechanics -->
+		<!--
+		<script src="js/namegen.js"></script>
+		<script src="js/solgen.js"></script>
+		-->
+		
+		<!-- 3D -->
+		<script src="js/three.min.js"></script>
+		<script src="js/MTLLoader.js"></script>
+		<script src="js/OBJMTLLoader.js"></script>
+		<script src="js/3d manip.js"></script>
+		<script src="js/initialize.js"></script>
+		<script src="js/rendering.js"></script>
+		<script src="js/resource_manager.js"></script>
+		
+		
+		<!-- Utilities -->
+		<script src="js/twister.js"></script>
+		<script src="js/pathing.js"></script>
+		<script src="js/collision.js"></script>
+		
+		<!-- Other -->
+		<script src="js/main.js"></script>
+		
+		
+	</head>
+	<body style="margin: 0;">	
+		<script> run();</script>
+		<div id="main" role="main">
+		<canvas id="game" width="0" height="0"></canvas>
+		</div>
+		
+		<script src="js/Stats.js"></script>
+	  <script>
+		  var stats = new Stats();
+		  stats.domElement.style.position = 'absolute';
+		  stats.domElement.style.left = '0px';
+		  stats.domElement.style.top = '0px';
+
+		  document.getElementById('main').appendChild( stats.domElement );
+
+		  setInterval( function () {
+
+			stats.update();
+
+		  }, 1000 / 60 );
+		  
+  </script>
+
+	</body>
+</html>

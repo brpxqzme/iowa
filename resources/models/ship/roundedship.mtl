@@ -1,0 +1,46 @@
+# Blender MTL File: 'roundedship.blend'
+# Material Count: 3
+# Material properties have been updated to allow:
+# - Environmental lighting [amount]
+# - Bumpmapping [texture]
+# - bump_power [depth]
+# - Metallic
+# - Faked glow from Ambient...
+#
+
+newmtl GLASS
+Ns 96.078431
+Ka 0.0 0.0 0.0
+Kd 0.000000 0.214784 0.800000
+Ks 0.500000 0.500000 0.500000
+Ni 1.000000
+d 1.0
+illum 2
+environment 0.5
+glow 0.15 0.25 0.5
+
+newmtl GLOWY
+Ns 96.078431
+Ka 0.000000 0.000000 0.000000
+Kd 0.800000 0.000000 0.000000
+Ks 0.500000 0.500000 0.500000
+Ni 1.000000
+d 1.000000
+illum 2
+environment 0.5
+glow 1.0 1.0 1.0
+
+newmtl Material.002
+Ns 96.078431
+Ka 0.000000 0.000000 0.000000
+Kd 0.640000 0.640000 0.640000
+Ks 0.500000 0.500000 0.500000
+Ni 1.000000
+d 1.000000
+illum 2
+map_Kd roundedship.jpg
+usebump roundedship.jpg
+bump_power 0.0125
+metallic
+environment 1.0
+
