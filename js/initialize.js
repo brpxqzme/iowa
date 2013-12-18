@@ -33,7 +33,13 @@ function initSpace() {
 	
 	//---------- Adding the sun to the scene --------------------
 	var sun = stars[CURRENT_LOCATION];
-	var sunsphere = new THREE.Mesh(new THREE.SphereGeometry(sun.radius,128,128),new THREE.MeshPhongMaterial({color: sun.color,ambient: sun.color}));
+	
+			var tex = generateSunTexture(CURRENT_LOCATION,2048);
+		var sunsphere = 
+			
+			new THREE.Mesh(new THREE.SphereGeometry(sun.radius,128,128),
+			new THREE.MeshPhongMaterial({  map: tex, specularmap: tex, ambient: 0xe7e7e7, bumpMap: tex, bumpScale:0.33 }));
+	
 	addToScene(sunsphere,"sun");
 	
 	var sunlight = new THREE.PointLight( sun.color, 2, 50000 );
@@ -52,11 +58,11 @@ function initSpace() {
 		var planet = planets[sysplanets[i]];
 		
 		
-		var tex = generateDataTexture(CURRENT_LOCATION,planet.name,512);
+		var tex = generateDataTexture(CURRENT_LOCATION,planet.name,1024);
 		var planetSphere = 
 			
 			new THREE.Mesh(new THREE.SphereGeometry(planet.radius,128,128),
-			new THREE.MeshPhongMaterial({  map: tex, specularmap: tex, ambient: 0xe7e7e7, bumpMap: tex, bumpScale:0.1 }));
+			new THREE.MeshPhongMaterial({  map: tex, specularmap: tex, ambient: 0xe7e7e7, bumpMap: tex, bumpScale:0.33 }));
 		
 		
 		addToScene(planetSphere,"planet"+i);
@@ -106,13 +112,15 @@ function pixelCoord(x,y,edgesize) {
 }
 
 function getPlanetType(seed) {
-	
-	var m = new MersenneTwister(seed);
+		
 	
 	var type = Math.abs(seed)%6;
 	
 	var chigh = [], cmid = [], clow = [];
 	var thigh, tmid;
+	
+	var oct=4;
+	var pers = 0.5;
 
 	switch (type) {
 		case 0: //Icy
@@ -120,15 +128,15 @@ function getPlanetType(seed) {
 			cmid = [0.1, 0.7, 0.8];
 			clow = [0.0, 0.1, 0.35];
 			
-			thigh = 0.65;
-			tmid =  0.25;
+			thigh = 0.875;
+			tmid =  0.275;
 			break;
 		case 1: //Rocky
 			chigh = [0.85, 0.89, 0.91];
 			cmid = [0.705, 0.7, 0.585];
 			clow = [0.375, 0.34, 0.5];
 			
-			thigh = 0.78;
+			thigh = 0.875;
 			tmid =  0.43;
 			break;
 		case 2: //Earthlike
@@ -137,8 +145,8 @@ function getPlanetType(seed) {
 			cmid = [0.25, 0.25, 0.15];
 			clow = [0.3, 0.5, 0.705];
 			
-			thigh = 0.825;
-			tmid =  0.66;
+			thigh = 0.875;
+			tmid =  0.625;
 			break;
 		case 3: //Lava Planet
 			//The high and mid have really high thresholds for the appearance of lava.
@@ -154,20 +162,20 @@ function getPlanetType(seed) {
 			cmid = [0.435, 0.625, 1.0];
 			clow = [0.1, 0.075, 0.4];
 			
-			thigh = 0.75;
-			tmid =  0.4;
+			thigh = 0.9;
+			tmid =  0.25;
 			break;
 		case 5:  //Gas Red/Yellow
 			chigh = [1.0, 1.0, 0.95];
 			cmid = [0.875, 0.255, 0.825];
 			clow = [0.3, 0.095, 0.125];
 			
-			thigh = 0.75;
-			tmid =  0.4;
+			thigh = 0.9;
+			tmid =  0.25;
 			break;
 	}
 
-	return { colorFilter: { high: chigh, mid: cmid, low: clow }, thresholds: { high: thigh, mid: tmid } };
+	return { colorFilter: { high: chigh, mid: cmid, low: clow }, thresholds: { high: thigh, mid: tmid }, octaves:oct, persistence:pers };
 }
 
 function processPixel(value,typeInfo) {
@@ -193,8 +201,6 @@ function processPixel(value,typeInfo) {
 	return pixel;
 }
 
-
-/*
 function createArray(length) {
     var arr = new Array(length || 0),
         i = length;
@@ -207,18 +213,70 @@ function createArray(length) {
     return arr;
 }
 
-function smoothNoise(pixelArray,octaveOn,edgesize) {
-	var newPixels = createArray(edgesize,edgesize);
-	for (var i = 0; i < edgesize; i++) {
+function smoothNoise(pixelArray,useArray,octaveOn,edgesize) {
 	
+	var period = Math.pow(2,octaveOn);
+	var freq = 1/period;
 	
+	for (var x = 0; x < edgesize; x++) {
+		var horiz1 = Math.floor((Math.floor(x)/period)*period);
+		var horiz2 = Math.floor(((horiz1 + period)*octaveOn)%edgesize);
+		var horizcombined = (x-horiz1)*freq;
+		
+		for (var y = 0; y < edgesize; y++) {
+			var vert1 = Math.floor((Math.floor(y)/period)*period);
+			var	vert2 = Math.floor(((vert1 + period)*octaveOn)%edgesize);
+			var vertcombined = (y-vert1)*freq;
+						
+			var top = cosInt(pixelArray[horiz1][vert1],pixelArray[horiz2][vert1],horizcombined);
+			
+			var bottom = cosInt(pixelArray[horiz1][vert2],pixelArray[horiz2][vert2],horizcombined);
+			
+			useArray[x][y] = cosInt(top,bottom,vertcombined);
+		}
+	}	
+}
+
+function perlinNoise(seed,octaves,persistence,edgesize,sunhax) {
+
+	if (sunhax === undefined) { sunhax = false; }
+	var pixel = createArray(edgesize,edgesize);
+	var m = new MersenneTwister(seed);
 	
-	
+	//White noise.
+	for (var x=0; x < edgesize; x++) {
+		for (var y = 0; y < edgesize; y++) {
+			pixel[x][y] = (m.random()*2)-1;
+		}
 	}
 
-
+	var amp = 1;
+	var totalAmp = 0;
+	for (var octave = 0; octave < octaves; octave++) {
+		var smooth = createArray(edgesize,edgesize);
+		smoothNoise(pixel,smooth,octave,edgesize);
+		for (var x=0; x < edgesize; x++) {
+			for (var y = 0; y < edgesize; y++) {
+				if (sunhax)
+					pixel[x][y] += smooth[x][y];
+				else 
+					pixel[x][y] += smooth[x][y]*amp;
+			}
+		}
+		amp *= persistence;
+		totalAmp += amp;
+	}
+	
+	
+	for (var x=0; x < edgesize; x++) {
+		for (var y = 0; y < edgesize; y++) {
+			pixel[x][y] = ((pixel[x][y]+1)/2)*totalAmp;
+		}
+	}
+	
+	return pixel;
+	
 }
-*/
 
 function generateDataTexture( ID_seed, name_seed, edgesize ) {
 
@@ -227,17 +285,13 @@ function generateDataTexture( ID_seed, name_seed, edgesize ) {
 	var typeInfo = getPlanetType(planetSeed);
 	var size = edgesize * edgesize;
 	var data = new Float32Array( 3 * size );
-	
-	//var octaves = 1;
-	//var persistence = 1;
-	
-	//var pixel = createArray(edgesize,edgesize);
-	var m = new MersenneTwister(planetSeed);
-	
+		
+				
+	var pixel = perlinNoise(planetSeed,typeInfo.octaves,typeInfo.persistence,edgesize);
+
 	for (var x=0; x < edgesize; x++) {
 		for (var y = 0; y < edgesize; y++) {
-			//pixel[y][x] = m.random();
-			var value = m.random();
+			var value = pixel[x][y];
 			var rgb = processPixel(value,typeInfo);
 			var i = pixelCoord(x,y,edgesize);
 			data[ i ]  = rgb.x;
@@ -245,16 +299,35 @@ function generateDataTexture( ID_seed, name_seed, edgesize ) {
 			data[ i + 2 ] = rgb.z;
 		}
 	}
-				
+	
+	var texture = new THREE.DataTexture( data, edgesize, edgesize, THREE.RGBFormat,THREE.FloatType );
+	texture.needsUpdate = true;
 
-			
-	/*
-	var rgb = processPixel(value,typeInfo);
-	var i = pixelCoord(x,y,edgesize);
-	data[ i ]  = rgb.x;
-	data[ i + 1 ] = rgb.y;
-	data[ i + 2 ] = rgb.z;
-	*/
+	return texture;
+	
+}
+
+function generateSunTexture( ID_seed, edgesize ) {
+
+
+	var planetSeed = ID_seed;
+	var typeInfo = getPlanetType(3)
+	var size = edgesize * edgesize;
+	var data = new Float32Array( 3 * size );
+		
+				
+	var pixel = perlinNoise(planetSeed,typeInfo.octaves,typeInfo.persistence,edgesize,true);
+
+	for (var x=0; x < edgesize; x++) {
+		for (var y = 0; y < edgesize; y++) {
+			var value = pixel[x][y];
+			var rgb = processPixel(value,typeInfo);
+			var i = pixelCoord(x,y,edgesize);
+			data[ i ]  = rgb.x;
+			data[ i + 1 ] = rgb.y;
+			data[ i + 2 ] = rgb.z;
+		}
+	}
 	
 	var texture = new THREE.DataTexture( data, edgesize, edgesize, THREE.RGBFormat,THREE.FloatType );
 	texture.needsUpdate = true;
