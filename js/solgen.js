@@ -7,8 +7,8 @@
 // DO NOT attempt to use .length on these in any meaningful way!
 var ids = []; // IDs in use (key: ID, value: array)
 var stars = []; // star systems by id
-                // at present, just the ones we need, but in the end,
-                // should contain all the visitable (and/or visible?) ones
+var starx = []; // associate star x positions to star ids (easy way to sort...)
+var stary = [];
 var planets = []; // planets cache by id
 //var gates = []; // warp gates cache by id
 
@@ -51,14 +51,51 @@ function makeOnlyOneSystem () {
 }
 
 function makeManySystems (n) {
+    var i, nextstar, theta, r;
     var rng = Prng(44); // this seed is arbitrary
     if (!exists(n)) n = 10000;
-    for (var i = 0; i < n-1; ++i)
+    for (i = 0; i < n-1; ++i)
         genSystem(rng);
     // leave one for questioning
     var id = genSystem(rng);
 
-    // TODO: assign places in galaxy to make pretty
+    // assign places in galaxy to make pretty
+    // Step 1: Use better RNG for better distribution
+    //  (uniqueness over RNG period is of less critical concern)
+    var m = new MersenneTwister(n); //seed based on number of stars
+    // Use three consecutive floats to get a (rough) standard normal
+    // distribution float.
+    m.randStd = function () {
+        return (this.genrand_real3()*2.0-1.0) +
+               (this.genrand_real3()*2.0-1.0) +
+               (this.genrand_real3()*2.0-1.0);
+    };
+
+    // Step 2: place stars at unique positions in elliptical
+    //  (okay... actually circular) galaxy.
+    for (i in stars) {
+        nextstar = false;
+        while (!nextstar) {
+            // Units: "light years" (not really), roughly Milky Way size
+            theta = m.random()*Math.PI*2.0; // anywhere in circle
+            r = m.randStd()*50000; // distance from center, biased to core
+            stars[i].x = Math.round(Math.cos(theta)*r);
+            stars[i].y = Math.round(Math.sin(theta)*r);
+
+            // starx and stary sort ids by key for position (this will aid
+            // nearest-star search while also having the desirable side effect
+            // of making sure we don't have any stars vertically or
+            // horizontally lined up with each other perfectly).
+            if (!exists(starx[stars[i].x]) && !exists(stary[stars[i].y])) {
+                starx[stars[i].x] = i;
+                stary[stars[i].y] = i;
+                // now that that's settled, get height off disc, too
+                // this is only used for graphical niceness
+                stars[i].z = Math.round(m.randStd()*3000);
+                nextstar = true;
+            }
+        }
+    }
 
     return id;
 }
