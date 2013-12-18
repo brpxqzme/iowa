@@ -6,48 +6,48 @@ function processEvents() {
 	//Choose planet destination via numbers (not numpad).
 	if (keyboard[49] && goalObject != "planet0") {
 		goalObject = "planet0";
-		console.log("Switching destination to planet "+0+": "+scenePlanets["planet0"].name);
+        notify("Heading for "+scenePlanets["planet0"].name+", "+stars[CURRENT_LOCATION].name+" system.");
 	}
 	
 	if (keyboard[50] && goalObject != "planet1") {
 		goalObject = "planet1";
-		console.log("Switching destination to planet "+1+": "+scenePlanets["planet1"].name);
+        notify("Heading for "+scenePlanets["planet1"].name+", "+stars[CURRENT_LOCATION].name+" system.");
 	}
 	
 	if (keyboard[51] && goalObject != "planet2") {
 		if (!(scenePlanets["planet2"] !== undefined)) { return; }
 		goalObject = "planet2";
-		console.log("Switching destination to planet "+2+": "+scenePlanets["planet2"].name);
+        notify("Heading for "+scenePlanets["planet2"].name+", "+stars[CURRENT_LOCATION].name+" system.");
 	}
 	
 	if (keyboard[52] && goalObject != "planet3") {
 		if (!(scenePlanets["planet3"] !== undefined)) { return; }
 		goalObject = "planet3";
-		console.log("Switching destination to planet "+3+": "+scenePlanets["planet3"].name);
+        notify("Heading for "+scenePlanets["planet3"].name+", "+stars[CURRENT_LOCATION].name+" system.");
 	}
 	
 	if (keyboard[53] && goalObject != "planet4") {
 		if (!(scenePlanets["planet4"] !== undefined)) { return; }
 		goalObject = "planet4";
-		console.log("Switching destination to planet "+4+": "+scenePlanets["planet4"].name);
+        notify("Heading for "+scenePlanets["planet4"].name+", "+stars[CURRENT_LOCATION].name+" system.");
 	}
 	
 	if (keyboard[54] && goalObject != "planet5") {
 		if (!(scenePlanets["planet5"] !== undefined)) { return; }
 		goalObject = "planet5";
-		console.log("Switching destination to planet "+5+": "+scenePlanets["planet5"].name);
+        notify("Heading for "+scenePlanets["planet5"].name+", "+stars[CURRENT_LOCATION].name+" system.");
 	}
 	
 	if (keyboard[45] && goalObject != "planet6") {
 		if (!(scenePlanets["planet6"] !== undefined)) { return; }
 		goalObject = "planet6";
-		console.log("Switching destination to planet "+6+": "+scenePlanets["planet6"].name);
+        notify("Heading for "+scenePlanets["planet6"].name+", "+stars[CURRENT_LOCATION].name+" system.");
 	}
 	
 	if (keyboard[46] && goalObject != "planet7") {
 		if (!(scenePlanets["planet7"] !== undefined)) { return; }
 		goalObject = "planet7";
-		console.log("Switching destination to planet "+7+": "+scenePlanets["planet7"].name);
+        notify("Heading for "+scenePlanets["planet7"].name+", "+stars[CURRENT_LOCATION].name+" system.");
 	}
 	
 	//Start travelling.

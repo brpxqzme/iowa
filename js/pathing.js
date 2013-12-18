@@ -1,5 +1,5 @@
 var shipViewToggle = [true,1.0];
-var travelling = false;
+var travelling = true;
 var goalObject = "planet0";
 
 var shipPhys = 
