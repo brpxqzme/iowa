@@ -5,17 +5,39 @@ Alfie Parthum
 
 1. Overview of game:
 
+
+
 2. Division of responsibilities:
+
+Primarily (but with significant overlap), group partners worked using the
+following division of labor:
+
+Alfie: Procedural generation, game engine logic
+Sam: Motion planning, graphics
 
 3. Use of procedural content generation:
 
 This game is capable of generating a large number of star systems and planets.
-It is possible to travel to these places. All of them have names, sizes, etc.
-and are (for all practical purposes) unique.
+It is possible to travel to these places in a spaceship. All of them have
+names, sizes, live-generated textures, etc. and are (for all practical
+purposes) unique.
+
+Names are generated based on Markov chains with some adjustments to keep
+names from being too short or too long for a galaxy of potentially billions
+of objects.
 
 4. Other technical components implemented in this game:
 
+- Hand-modeled spacecraft
+- Galactic generation cached in a component-entity system-like structure
+- Noise-based texture generation on celestial bodies
+- Keypress-based navigational system
+- Text-based player message notifier
+
 5. Required technique implemented:
+
+Motion planning: The ship attempts to move between target planets without
+colliding into one.
 
 6. Is this game modeled after an existing game?
 
