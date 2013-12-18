@@ -1,25 +1,34 @@
+//First variable determines if the second number recieves addition or subtraction,
+//second determines the interpolation time between the camera positions.
 var shipViewToggle = [true,1.0];
-var travelling = true;
+
+//Object we are heading to
 var goalObject = "planet0";
+
+//Object we are orbiting, and the center of orbit, as well as if the direction it is
+//orbiting is positive (angle+20 or angle-20, for instance, when determining next orbit position)
+var orbiting = ["none",new THREE.Vector3(0,0,0),false];
+
+//If we're using an overhead camera view or the normal ship camera view
+var camToggle = false;
+
+//If the ship is travelling or not
+var travelling = true;
 
 var shipPhys = 
 {
-	maxThrust: 0.05, //can be adjusted when we have upgradable ships.
-	maxVel: 5,
+	maxThrust: 10, //can be adjusted when we have upgradable ships.
+	maxVel: 100,
 	velocity: new THREE.Vector3(0,0,0),
 	acceleration: new THREE.Vector3(0,0,0),
-	force: new THREE.Vector3(0,0,0),
 	mass: 100
 };
 
 var camPhys = 
 {
-	maxThrust: 0.25, //can be adjusted when we have upgradable ships.
-	maxVel: 6,
+	maxThrust: 0.1, //can be adjusted when we have upgradable ships.
 	velocity: new THREE.Vector3(0,0,0),
 	acceleration: new THREE.Vector3(0,0,0),
-	force: new THREE.Vector3(0,0,0),
-	mass: 1
 };
 
 //Stuff for the camera to freely roam away from the spaceship...
@@ -66,9 +75,6 @@ function shipPathing(toWhere,radius) {
 		shipPhys.velocity.multiplyScalar(0.5);
 	}
 	
-	
-	
-	
 	return dist;
 	
 }
@@ -78,7 +84,6 @@ function cameraPathing() {
 	//Use the ship itself to generate coordinates the camera can be located at.
 	var ship = grabObject("spaceship")[1];
 	
-	var arbitraryHeight = (1+Math.random()*5)+17.5;
 	//The camera will try to switch between a side view, back view, and other side view of the ship.	
 	//------------------------------------------------------------
 	//View from right side.
@@ -87,9 +92,9 @@ function cameraPathing() {
 	rhs3 = new THREE.Vector3(0,5,10);  //top
 	//------------------------------------------------------------
 	//View from left side.
-	lhs1 = new THREE.Vector3(0,5,-5);  //bl
+	lhs1 = new THREE.Vector3(15,5,-5);  //bl
 	lhs2 = new THREE.Vector3(50,5,-5); //br
-	lhs3 = new THREE.Vector3(0,5,5); //top
+	lhs3 = new THREE.Vector3(15,5,5); //top
 	//------------------------------------------------------------
 	//View from back side.
 	mhs1 = new THREE.Vector3(-25,-5,-35); //bl
@@ -115,14 +120,14 @@ function cameraPathing() {
 	var toggleAmount = 0.01;
 	
 	if (shipViewToggle[0]) {
-		shipViewToggle[1] += toggleAmount/3;
+		shipViewToggle[1] += toggleAmount/2;
 		if (shipViewToggle[1] > 1.0) {
 			shipViewToggle[1] = 1.0;
 			shipViewToggle[0] = false;
 		}
 	}
 	else {
-		shipViewToggle[1] -= toggleAmount/5;
+		shipViewToggle[1] -= toggleAmount/4;
 		if (shipViewToggle[1] < -1.0) {
 			shipViewToggle[1] = -1.0;
 			shipViewToggle[0] = true;
@@ -145,7 +150,7 @@ function cameraPathing() {
 		(t1.z+t2.z+t3.z)/3);
 	
 	var dist = center.clone().sub(camera.position);
-	dist.multiplyScalar(camPhys.maxThrust);
+	dist.multiplyScalar(camPhys.maxThrust*4);
 
 	var a,b,c,s,area;
 	a = t1.distanceTo(t2);
@@ -155,11 +160,10 @@ function cameraPathing() {
 	var area = Math.sqrt(s*(s-a)*(s-b)*(s-c));
 
 	
-	if (camera.position.distanceTo(center) < area/2) {
+	if (camera.position.distanceTo(center) < area*3) {
 		dist.multiplyScalar(0.333);
 		camPhys.velocity.multiplyScalar(0.666);
 	}
-	
 	
 	return dist;
 }
@@ -171,20 +175,41 @@ function shipUpdate() {
 	if (!goal[0] || !ship[0]) return;
 	
 	var sizeOfShip = 32;
-	
 	var radius = sizeOfShip;
 	if (goalObject.indexOf("planet") != -1) {
-		radius += scenePlanets[goalObject].radius;
+		radius += scenePlanets[goalObject].radius*1.5;
 	}
 	
 	ship = ship[1];
 	goal = goal[1];
 	
-	//Prevent wonky angle rotation when objects are on top of each other...
-	if (goal.position.clone().sub(ship.position).length() < radius) return;
+	var t = travelling;
+	
+		//Allow the ship to rotate planets when it's hit the target.
+	if (goal.position.clone().sub(ship.position).length() < radius*2.5) {
+		shipPhys.velocity.multiplyScalar(0.9);
+	}
+	if (goal.position.clone().sub(ship.position).length() < radius)  { 
+		travelling = false;
+		orbiting[0] = goalObject;
+		orbiting[1] = goal.position;
+		orbiting[2] = false;
+	}
+	else {
+		//Redundancy to ensure that the orbiting doesn't cause the ship to not be able to go anywhere else.
+		orbiting[0] = "none";
+		orbiting[1] = goal.position;
+		orbiting[2] = false;
+	}
+	
+	
+	//Just check and see where the ship /would/ be heading, so we can ignore the orbit if necessary.
+	shipPhys.acceleration = shipPathing(goal.position,radius+1024);
+	orbitRadiusCheck(ship.position);
 	
 	//If the ship is not travelling, let it come to a stop.
-	if (!travelling) { 
+	if (!travelling && orbiting[0] === "none") { 
+		//Ship is stopping in the middle of space.
 		var vel_len = shipPhys.velocity.length();
 		if (vel_len == 0.0) {}
 		else if (vel_len > 0.1) {
@@ -196,36 +221,57 @@ function shipUpdate() {
 		ship.position = ship.position.add(shipPhys.velocity);
 		return;
 	}
+	//
+	else if (orbiting[0] !== "none") {
+		var lookAtMe = doOrbitUpdate(ship);
+		ship.lookAt(lookAtMe);
 	
-	shipPhys.acceleration = shipPathing(goal.position,radius+512);
-	shipPhys.velocity.add(shipPhys.acceleration);
+	}
+	else {
+		//travelling and not orbiting -- can use force-based trajectories.
+		shipPhys.velocity.add(shipPhys.acceleration);
+		while (shipPhys.velocity.length() > shipPhys.maxVel) { shipPhys.velocity.multiplyScalar(0.98); }
+		
+		ship.position = ship.position.add(shipPhys.velocity);
+		if (shipPhys.acceleration.length() < 0.005 && shipPhys.velocity.length() < 0.005) return;
+		var tquat = ship.quaternion.clone();
+		
+		ship.lookAt(ship.position.clone().add(shipPhys.velocity).add(shipPhys.acceleration));
+		ship.quaternion.slerp(tquat,0.9);
+	}
+	
+	//console.log(ship.position.distanceTo(goal.position));
+	
+	if (t && !travelling) { notify("You have reached your destination."); }
+	
 
-	while (shipPhys.velocity.length() > shipPhys.maxVel) { shipPhys.velocity.multiplyScalar(0.98); }
-	
-	//shipPhys.acceleration = getPlanetForces(ship[1]);
-
-	
-	ship.position = ship.position.add(shipPhys.velocity);
-	if (shipPhys.acceleration.length() < 0.005 && shipPhys.velocity.length() < 0.005) return;
-	var tquat = ship.quaternion.clone();
-	ship.lookAt(ship.position.clone().add(shipPhys.velocity).add(shipPhys.acceleration.multiplyScalar(48.0)));
-	
-	ship.quaternion.slerp(tquat,0.925);
-	//ship[1].quaternion.slerp(tquat,0.970988-14.5258*shipPhys.maxThrust);
 }
 
 function camUpdate() {
 	
-	camPhys.acceleration = cameraPathing(16);
-	camPhys.velocity.add(camPhys.acceleration);
+	if (camToggle) {
+		var ship = grabObject("spaceship");
+		if (ship[0]) {
+			camera.position = ship[1].position.clone().add(new THREE.Vector3(0,300,50));
+			camera.lookAt(ship[1].position);
+		}
+	}
+	else {
+		camPhys.acceleration = cameraPathing(16);
+		camPhys.velocity.add(camPhys.acceleration);
+		camera.position = camera.position.add(camPhys.velocity);
+		camera.lookAt(grabObject("spaceship")[1].position);
+	}
 	
-	camera.position = camera.position.add(camPhys.velocity);
-	camera.lookAt(grabObject("spaceship")[1].position);
 
 }
 
 function toRadians(degs) {
 	return degs*0.0174532925;
+}
+
+function toDegrees(rads) {
+	return rads*57.2957795;
 }
 
 //Cosine interpolation of a vector's components individually.
