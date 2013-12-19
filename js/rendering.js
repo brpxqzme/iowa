@@ -6,70 +6,72 @@ function processEvents() {
         //Choose planet destination via numbers (not numpad).
         if (keyboard[49] && goalObject != "planet0") {
                 goalObject = "planet0";
-				travelling=true;  
+                                travelling=true;  
         notify("Heading for "+scenePlanets["planet0"].name+", "+stars[CURRENT_LOCATION].name+" system.");
         }
         
         if (keyboard[50] && goalObject != "planet1") {
                 goalObject = "planet1";
-				travelling=true;  
+                                travelling=true;  
         notify("Heading for "+scenePlanets["planet1"].name+", "+stars[CURRENT_LOCATION].name+" system.");
         }
         
         if (keyboard[51] && goalObject != "planet2") {
                 if (!(scenePlanets["planet2"] !== undefined)) { return; }
                 goalObject = "planet2";
-				travelling=true;  
+                                travelling=true;  
         notify("Heading for "+scenePlanets["planet2"].name+", "+stars[CURRENT_LOCATION].name+" system.");
         }
         
         if (keyboard[52] && goalObject != "planet3") {
                 if (!(scenePlanets["planet3"] !== undefined)) { return; }
                 goalObject = "planet3";
-				travelling=true;  
+                                travelling=true;  
         notify("Heading for "+scenePlanets["planet3"].name+", "+stars[CURRENT_LOCATION].name+" system.");
         }
         
         if (keyboard[53] && goalObject != "planet4") {
                 if (!(scenePlanets["planet4"] !== undefined)) { return; }
                 goalObject = "planet4";
-				travelling=true;  
+                                travelling=true;  
         notify("Heading for "+scenePlanets["planet4"].name+", "+stars[CURRENT_LOCATION].name+" system.");
         }
         
         if (keyboard[54] && goalObject != "planet5") {
                 if (!(scenePlanets["planet5"] !== undefined)) { return; }
                 goalObject = "planet5";
-				travelling=true;  
+                                travelling=true;  
         notify("Heading for "+scenePlanets["planet5"].name+", "+stars[CURRENT_LOCATION].name+" system.");
         }
         
         if (keyboard[45] && goalObject != "planet6") {
                 if (!(scenePlanets["planet6"] !== undefined)) { return; }
                 goalObject = "planet6";
-				travelling=true;  
+                                travelling=true;  
         notify("Heading for "+scenePlanets["planet6"].name+", "+stars[CURRENT_LOCATION].name+" system.");
         }
         
         if (keyboard[46] && goalObject != "planet7") {
                 if (!(scenePlanets["planet7"] !== undefined)) { return; }
                 goalObject = "planet7";
-				travelling=true;  
+                                travelling=true;  
         notify("Heading for "+scenePlanets["planet7"].name+", "+stars[CURRENT_LOCATION].name+" system.");
         }
         
         //Start travelling.
         if (keyboard[65]) {
+			if (orbiting[0] === goalObject) { return; }
                 travelling=true;        
                 console.log("Starting journey.");
         }
         //Stop Travelling
         if (keyboard[83]) {
+			if (!travelling) return;
                 travelling=false;
                 console.log("Stopping journey.");
         }
-		
-		 //Camera overhead view toggle ON
+                
+                 //Camera overhead view toggle ON
         if (keyboard[79]) {
                 camToggle=true;        
         }
