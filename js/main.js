@@ -1,4 +1,5 @@
 ﻿var keyboard = {};
+var mouse = { x: 0, y: 0 };
 var textdiv;
 
 function addEvent(node, name, func) {
@@ -17,7 +18,20 @@ function addKeyboardEvents() {
 	addEvent(document, "keyup", function (e) {
 		keyboard[e.keyCode] = false;
 	});
+}
 
+function addMouseEvents () {
+    addEvent(document, "mousedown", function (e) {
+        // update global mouse, normalize range, x+ is right, y+ is up
+        mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
+        mouse.y = (e.clientY / window.innerHeight) * 2 + 1;
+
+        if (mouse.x > 2/3 && mouse.y < 0) { // clicked lr area (or thereabouts)
+            minimapClicked();
+        } else if (mouse.x < 2/3) {
+            // do something in the main view?
+        }
+    });
 }
 
 function initTextDiv () {

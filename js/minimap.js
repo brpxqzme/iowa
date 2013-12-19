@@ -20,3 +20,8 @@ function makeMap () {
     mapscn.add(stars_system);
     mapscn.add(mapcam);
 }
+
+// expects global mouse {x, y} filled normalized to SCREEN, not minimap
+function minimapClicked () {
+    return; // stub
+}
