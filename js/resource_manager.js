@@ -23,6 +23,12 @@ function clearScene() {
 	attachedLights.length=0;
 	loads.length = 0;
 	scenePlanets.length = 0;
+	
+	sceneObjects = [];
+	objectNames = [];
+	attachedLights = [];
+	loads = [];
+	scenePlanets = [];
  }
 
 function addToScene(thingToAdd,nameOfThing) { 
