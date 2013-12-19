@@ -2,6 +2,8 @@
 var mapcam, mapscn;
 // Star particle geometry
 var stars_system;
+// particle highlighting current location
+var map_highlight;
 
 function makeMap () {
     mapscn = new THREE.Scene();
@@ -15,8 +17,16 @@ function makeMap () {
                                                        stars[i].z));
     var stars_partmat = new THREE.ParticleBasicMaterial({ color: 0xffffff,
                                                           size: 1 });
-    var stars_system = new THREE.ParticleSystem(stars_geometry,
-                                                stars_partmat);
+    stars_system = new THREE.ParticleSystem(stars_geometry,
+                                            stars_partmat);
+    var hi_geo = new THREE.Geometry();
+    hi_geo.vertices.push(new THREE.Vector3(stars[CURRENT_LOCATION].x,
+                                           stars[CURRENT_LOCATION].y,
+                                           5999));
+    var hi_partmat = new THREE.ParticleBasicMaterial({ color: 0xaa0000,
+                                                       size: 300 });
+    map_highlight = new THREE.ParticleSystem(hi_geo, hi_partmat);
+    mapscn.add(map_highlight);
     mapscn.add(stars_system);
     mapscn.add(mapcam);
 }
@@ -26,7 +36,7 @@ function minimapClicked (x, y) {
     var mapdim = window.innerWidth/6,
         maptop = window.innerHeight - mapdim,
         mapleft = window.innerWidth - mapdim,
-        mx = ((x - mapleft)/mapdim)*2.0-1,
+        mx = ((x - mapleft)/mapdim)*2.0-1, // map coordinates clicked
         my = -((y - maptop)/mapdim)*2.0+1,
         gx = mx*50000, // galactic coordinates clicked
         gy = my*50000,
@@ -41,6 +51,9 @@ function minimapClicked (x, y) {
             closeid = i;
         }
     }
+    map_highlight.geometry.vertices[0].x = stars[i].x;
+    map_highlight.geometry.vertices[0].y = stars[i].y;
+    map_highlight.geometry.verticesNeedUpdate = true;
     // switch to system nearest to mouse click
     switchSystem(i);
     return;
