@@ -95,6 +95,7 @@ function renderSetup() {
     var SCREEN_WIDTH = window.innerWidth,
         SCREEN_HEIGHT = window.innerHeight,
         ASPECT = (SCREEN_WIDTH * 5/6) / SCREEN_HEIGHT;
+    renderer.autoClear = false; // don't wipe other viewports
 	renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
 	document.getElementById("ThreeJS").appendChild(renderer.domElement);
 

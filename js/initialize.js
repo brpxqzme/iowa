@@ -32,6 +32,7 @@ function initSpace() {
     notify("You begin your travels in the " + stars[CURRENT_LOCATION].name +
            " system, headed for planet " +
            planets[stars[CURRENT_LOCATION].planets[0]].name + ".");
+    makeMap();
 	scenePlanets.length = 0;
 	
 	//---------- Adding the sun to the scene --------------------

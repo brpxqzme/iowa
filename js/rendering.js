@@ -102,13 +102,14 @@ function animate() {
 
         // Main scene renderer.
     renderer.setViewport(0, 0, MAIN_WIDTH, PIXELS_HEIGHT);
-        renderer.render( scene, camera );
+    renderer.render(scene, camera);
 
-    // Minimap placeholder
+    // Minimap
     renderer.setViewport(MAIN_WIDTH + 1, 0, TEXT_WIDTH, TEXT_HEIGHT);
+    renderer.render(mapscn, mapcam);
 
-    // Minimap placeholder
-    renderer.setViewport(MAIN_WIDTH + 1, TEXT_HEIGHT+1,
-                         TEXT_WIDTH, PIXELS_HEIGHT - TEXT_HEIGHT);
+    // Viewport behind text div (just in case it's needed).
+    //renderer.setViewport(MAIN_WIDTH + 1, TEXT_HEIGHT+1,
+    //                     TEXT_WIDTH, PIXELS_HEIGHT - TEXT_HEIGHT);
         //controls.update();
 }

@@ -78,7 +78,7 @@ function makeManySystems (n) {
         while (!nextstar) {
             // Units: "light years" (not really), roughly Milky Way size
             theta = m.random()*Math.PI*2.0; // anywhere in circle
-            r = m.randStd()*50000; // distance from center, biased to core
+            r = m.randStd()*50000/3; // distance from center, biased to core
             stars[i].x = Math.round(Math.cos(theta)*r);
             stars[i].y = Math.round(Math.sin(theta)*r);
 
