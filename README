@@ -12,8 +12,8 @@ Alfie Parthum
 Primarily (but with significant overlap), group partners worked using the
 following division of labor:
 
-Alfie: Procedural generation, game engine logic
-Sam: Motion planning, graphics
+Alfie: Procedural generation (universe generation), game engine logic, multiple viewports and stars
+Sam: Motion/camera planning, graphics system and rendering stuff, procedural generation (texture).
 
 3. Use of procedural content generation:
 
