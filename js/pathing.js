@@ -32,6 +32,7 @@ var camPhys =
 	maxThrust: 0.1, //can be adjusted when we have upgradable ships.
 	velocity: new THREE.Vector3(0,0,0),
 	acceleration: new THREE.Vector3(0,0,0),
+	lastLookAt: new THREE.Vector3(0,0,0),
 };
 
 //Stuff for the camera to freely roam away from the spaceship...
@@ -196,13 +197,13 @@ function shipUpdate() {
 		travelling = false;
 		orbiting[0] = goalObject;
 		orbiting[1] = goal.position;
-		orbiting[2] = false;
+		orbiting[2] = true;
 	}
 	else {
 		//Redundancy to ensure that the orbiting doesn't cause the ship to not be able to go anywhere else.
 		orbiting[0] = "none";
 		orbiting[1] = goal.position;
-		orbiting[2] = false;
+		orbiting[2] = true;
 	}
 	
 	
@@ -254,18 +255,24 @@ function shipUpdate() {
 
 function camUpdate() {
 	
+	var ship = grabObject("spaceship");
+	
+	var interpolatedLookAt = cosIntVec(ship[1].position,camPhys.lastLookAt,0.5);
+	camPhys.lastLookAt = ship[1].position.clone();
+	
 	if (camToggle) {
-		var ship = grabObject("spaceship");
 		if (ship[0]) {
 			camera.position = ship[1].position.clone().add(new THREE.Vector3(0,300,50));
-			camera.lookAt(ship[1].position);
+			camera.lookAt((ship[1].position.clone().add(camPhys.lastLookAt)).multiplyScalar(0.5));
+			camera.lookAt(interpolatedLookAt);
 		}
 	}
 	else {
 		camPhys.acceleration = cameraPathing(16);
 		camPhys.velocity.add(camPhys.acceleration);
 		camera.position = camera.position.add(camPhys.velocity);
-		camera.lookAt(grabObject("spaceship")[1].position);
+		camera.lookAt(interpolatedLookAt);
+		
 	}
 	
 
