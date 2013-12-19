@@ -22,6 +22,7 @@ function clearScene() {
 	objectNames.length=0;
 	attachedLights.length=0;
 	loads.length = 0;
+	scenePlanets.length = 0;
  }
 
 function addToScene(thingToAdd,nameOfThing) { 
