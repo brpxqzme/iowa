@@ -40,23 +40,28 @@ canvas { margin: 0px; padding: 0px; }
 	<body>
 		<div id="ThreeJS" style="position: absolute; left: 0px; top: 0px;">
 		</div>
-		<script> run();</script>
+        <audio id="bgmusic"></audio>
+        <script>
+            run();
+// Commented out to keep from driving us insane
+//            var music = document.getElementById("bgmusic");
+//            music.src = "resources/RoamingAround.mp3";
+//            music.load();
+//            music.play();
+// Kept to every 10 minutes to keep from driving players insane
+//            setInterval(function () { music.play(); }, 10 * 1000 * 60);
+        </script>
 		
 		<script src="js/Stats.js"></script>
-	  <script>
-		  var stats = new Stats();
-		  stats.domElement.style.position = 'absolute';
-		  stats.domElement.style.left = '0px';
-		  stats.domElement.style.top = '0px';
+        <script>
+            var stats = new Stats();
+            stats.domElement.style.position = 'absolute';
+            stats.domElement.style.left = '0px';
+            stats.domElement.style.top = '0px';
 
-		  document.getElementById('ThreeJS').appendChild( stats.domElement );
+            document.getElementById('ThreeJS').appendChild( stats.domElement );
 
-		  setInterval( function () {
-
-			stats.update();
-
-		  }, 1000 / 60 );
-		  
-  </script>
+            setInterval( function () { stats.update(); }, 1000 / 60 );
+        </script>
 	</body>
 </html>
