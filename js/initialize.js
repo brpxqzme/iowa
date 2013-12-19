@@ -51,7 +51,7 @@ function setupScene(ID,setShip) {
 
 	var sun = stars[CURRENT_LOCATION];
         
-	var tex = generateSunTexture(CURRENT_LOCATION,2048);
+	var tex = generateSunTexture(CURRENT_LOCATION,1024);
 	var sunsphere =		
 		new THREE.Mesh(new THREE.SphereGeometry(sun.radius,128,128),
 		new THREE.MeshPhongMaterial({  map: tex, specularmap: tex, ambient: 0xe7e7e7, bumpMap: tex, bumpScale:0.33 }));
@@ -61,8 +61,7 @@ function setupScene(ID,setShip) {
 	var sunlight = new THREE.PointLight( sun.color, 2, 50000 );
 	sunlight.position.set( 0, 0, 0 );
 	sunlight.castShadow = true;
-	sunlight.shadowMapWidth = 512;
-	sunlight.shadowMapHeight = 512;
+	sunlight.shadowMapWidth = 512;	sunlight.shadowMapHeight = 512;
 	sunlight.shadowCameraNear = 500;
 	sunlight.shadowCameraFar = 8000;
 	sunlight.shadowCameraFov = 30;
@@ -72,7 +71,7 @@ function setupScene(ID,setShip) {
 	for (var i = 0; i < sysplanets.length; ++i) {
 		var planet = planets[sysplanets[i]];
 		
-		var tex = generateDataTexture(CURRENT_LOCATION,planet.name,1024);
+		var tex = generateDataTexture(CURRENT_LOCATION,planet.name,512);
 		var planetSphere = 
 				
 				new THREE.Mesh(new THREE.SphereGeometry(planet.radius,128,128),
@@ -200,17 +199,19 @@ function getPlanetType(seed) {
                         tmid =  0.25;
                         break;
                 case 5:  //Gas Red/Yellow
-                        chigh = [1.0, 1.0, 0.95];
-                        cmid = [0.875, 0.255, 0.825];
+                        chigh = [0.925, 0.66, 0.25];
+                        cmid = [0.875, 0.255, 0.25];
                         clow = [0.3, 0.095, 0.125];
                         
-                        thigh = 0.9;
-                        tmid =  0.25;
+                        thigh = 0.925;
+                        tmid =  0.4;
                         break;
         }
 
         return { colorFilter: { high: chigh, mid: cmid, low: clow }, thresholds: { high: thigh, mid: tmid }, octaves:oct, persistence:pers };
 }
+
+
 
 function processPixel(value,typeInfo) {
         
@@ -247,31 +248,61 @@ function createArray(length) {
     return arr;
 }
 
-function smoothNoise(pixelArray,useArray,octaveOn,edgesize) {
+/*function smoothNoise(pixelArray,useArray,octaveOn,edgesize) {
         
         var period = Math.pow(2,octaveOn);
         var freq = 1/period;
         
-        for (var x = 0; x < edgesize; x++) {
+        for (var x = 0; x < edgesize; x+= edgesize / (octaveOn+1)) {
                 var horiz1 = Math.floor((Math.floor(x)/period)*period);
-                var horiz2 = Math.floor(((horiz1 + period)*octaveOn)%edgesize);
+                var horiz2 = Math.floor(((horiz1 + period))%edgesize);
                 var horizcombined = (x-horiz1)*freq;
                 
-                for (var y = 0; y < edgesize; y++) {
+                for (var y = 0; y < edgesize; y+=edgesize / (octaveOn+1)) {
                         var vert1 = Math.floor((Math.floor(y)/period)*period);
-                        var        vert2 = Math.floor(((vert1 + period)*octaveOn)%edgesize);
+                        var        vert2 = Math.floor(((vert1 + period))%edgesize);
                         var vertcombined = (y-vert1)*freq;
                                                 
                         var top = cosInt(pixelArray[horiz1][vert1],pixelArray[horiz2][vert1],horizcombined);
                         
                         var bottom = cosInt(pixelArray[horiz1][vert2],pixelArray[horiz2][vert2],horizcombined);
                         
-                        useArray[x][y] = cosInt(top,bottom,vertcombined);
+						for (var tx = 0; tx < edgesize / (octaveOn+1); tx++) {
+							console.log(tx);
+							for (var ty = 0; ty < edgesize / (octaveOn+1); ty++) {
+								useArray[(tx+x)%edgesize][(ty+y)%edgesize] = cosInt(top,bottom,vertcombined);
+							}
+						}
+                        
                 }
         }        
+}*/
+
+function quickSmooth(pixels,smooth,octaveOn,edgesize) {
+	
+	var jump = Math.floor(edgesize/(octaveOn+1));
+	
+	for (var x = 0; x < edgesize; x=x+jump) {
+		for (var y = 0; y < edgesize; y=y+jump) {
+		
+			var value = 0;
+			
+			for (var a = 0; a < jump; a++) {
+				for (var b = 0; b < jump; b++) {
+					value += pixels[(x+a)%edgesize][(y+b)%edgesize];
+				}
+			}
+			value /= jump*jump;
+			for (var a = 0; a < jump; a++) {
+				for (var b = 0; b < jump; b++) {
+					smooth[(x+a)%edgesize][(y+b)%edgesize] = value;
+				}
+			}
+		}
+	}
 }
 
-function perlinNoise(seed,octaves,persistence,edgesize,sunhax) {
+function perlinNoise(seed,octaves,persistence,edgesize,sunhax,typeInfo) {
 
         if (sunhax === undefined) { sunhax = false; }
         var pixel = createArray(edgesize,edgesize);
@@ -288,13 +319,15 @@ function perlinNoise(seed,octaves,persistence,edgesize,sunhax) {
         var totalAmp = 0;
         for (var octave = 0; octave < octaves; octave++) {
                 var smooth = createArray(edgesize,edgesize);
-                smoothNoise(pixel,smooth,octave,edgesize);
+                quickSmooth(pixel,smooth,octave,edgesize);
                 for (var x=0; x < edgesize; x++) {
                         for (var y = 0; y < edgesize; y++) {
                                 if (sunhax)
-                                        pixel[x][y] += smooth[x][y];
+                                        pixel[x][y] += cosInt(smooth[x][y],0.333,0.5);
                                 else 
                                         pixel[x][y] += smooth[x][y]*amp;
+								
+										
                         }
                 }
                 amp *= persistence;
@@ -321,7 +354,7 @@ function generateDataTexture( ID_seed, name_seed, edgesize ) {
         var data = new Float32Array( 3 * size );
                 
                                 
-        var pixel = perlinNoise(planetSeed,typeInfo.octaves,typeInfo.persistence,edgesize);
+        var pixel = perlinNoise(planetSeed,typeInfo.octaves,typeInfo.persistence,edgesize,false,typeInfo);
 
         for (var x=0; x < edgesize; x++) {
                 for (var y = 0; y < edgesize; y++) {
@@ -350,7 +383,7 @@ function generateSunTexture( ID_seed, edgesize ) {
         var data = new Float32Array( 3 * size );
                 
                                 
-        var pixel = perlinNoise(planetSeed,typeInfo.octaves,typeInfo.persistence,edgesize,true);
+        var pixel = perlinNoise(planetSeed,typeInfo.octaves,typeInfo.persistence,edgesize,true,typeInfo);
 
         for (var x=0; x < edgesize; x++) {
                 for (var y = 0; y < edgesize; y++) {
