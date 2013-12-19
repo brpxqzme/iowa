@@ -14,6 +14,7 @@ function populate() {
 }
 
 function switchSystem(ID) {
+	CURRENT_LOCATION = ID;
 	notify("You have arrived at the " + stars[CURRENT_LOCATION].name +
 	" system, headed for planet " +
 	planets[stars[CURRENT_LOCATION].planets[0]].name + ".");
@@ -23,6 +24,7 @@ function switchSystem(ID) {
 }
 
 function setupScene(ID,setShip) {
+	CURRENT_LOCATION = ID;
 	//No need to reload the ship each time we do this, that's horrible overhead.
 	if (setShip !== undefined && setShip) {
 		var ship = grabObject("spaceship")[1].clone(); 
@@ -42,8 +44,7 @@ function setupScene(ID,setShip) {
         sphr3.translateY(-1);
 		sphr3.visible = false;
         addToScene(sphr3,"goal");
-		
-	CURRENT_LOCATION = ID;		   
+		   
 	makeMap();
 	
 	   
@@ -93,6 +94,8 @@ function setupScene(ID,setShip) {
     var stars_partmat = new THREE.ParticleBasicMaterial({ color: 0xffffff, ambient:0xffffff, size: 4 });
     var stars_system = new THREE.ParticleSystem(stars_geometry,stars_partmat);								
 	scene.add(stars_system);
+	
+	changed = true;
 	
 }
 
