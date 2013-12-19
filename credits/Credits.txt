@@ -13,3 +13,8 @@ Why use a ParticleSystem:
 We didn't end up examining this one too closely, but it showed that what
 we were trying to do is more than possible (and it runs very fast!):
 - https://github.com/judnich/Kosmos
+
+
+Obviously procedural noise is a big thing, and these two resources have proven helpful in the past for noise generation algorithms:
+ - http://devmag.org.za/2009/04/25/perlin-noise/
+ - http://freespace.virgin.net/hugo.elias/models/m_perlin.htm
