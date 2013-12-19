@@ -248,9 +248,16 @@ function shipUpdate() {
 	
 	//console.log(ship.position.distanceTo(goal.position));
 	
-	if (t && !travelling) { notify("You have reached your destination."); }
-	
-
+	if (t && !travelling) { 
+		if (goalObject.indexOf("planet") != -1) {
+			if (scenePlanets[goalObject].visited) { notify("Welcome back to "+scenePlanets[goalObject].name+"!"); }
+			else {
+				scenePlanets[goalObject].visited = true;
+				notify("Welcome to the planet "+scenePlanets[goalObject].name+"!");
+				notify("This planet "+planetDescription(CURRENT_LOCATION+31*scenePlanets[goalObject].name.hashCode()));
+			}
+		}
+	}
 }
 
 function camUpdate() {
@@ -299,4 +306,41 @@ function cosIntVec(vStart,vEnd,time) {
 function cosInt(start,end,time) {
 	var t2 = (1.0-Math.cos(time*Math.PI))/2.0;
 	return (start*(1.0-t2)+t2*end);
+}
+
+
+function planetDescription(seed) {
+
+        var type = Math.abs(seed)%6;
+        
+        var chigh = [], cmid = [], clow = [];
+        var thigh, tmid;
+        
+        var oct=4;
+        var pers = 0.5;
+
+        switch (type) {
+                case 0: //Icy
+					return "is very cool!";
+                        break;
+                case 1: //Rocky
+					return "rocks!";
+                        break;
+                case 2: //Earthlike
+                        //using the cutoff between mid and low to differentiate land and sea.
+					return "is teeming with lots of life!";
+                        break;
+                case 3: //Lava Planet
+                        //The high and mid have really high thresholds for the appearance of lava.
+					return "is very hot!";
+                        break;
+                case 4: //Gas Blue/Green
+					return "looks like a sea of wonder.";
+                        break;
+                case 5:  //Gas Red/Yellow
+					return "has violent storms on its surface.";
+                        break;
+        }
+
+
 }
