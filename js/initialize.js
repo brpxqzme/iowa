@@ -97,6 +97,8 @@ function setupScene(ID,setShip) {
 	
 	changed = true;
 	
+	goalObject = "planet0";
+	
 }
 
 function initSpace() {
