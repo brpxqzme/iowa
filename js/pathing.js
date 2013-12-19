@@ -2,6 +2,9 @@
 //second determines the interpolation time between the camera positions.
 var shipViewToggle = [true,1.0];
 
+//The orbiting distance.
+var radiusMultiplier = 1.5;
+
 //Object we are heading to
 var goalObject = "planet0";
 
@@ -150,7 +153,7 @@ function cameraPathing() {
 		(t1.z+t2.z+t3.z)/3);
 	
 	var dist = center.clone().sub(camera.position);
-	dist.multiplyScalar(camPhys.maxThrust*4);
+	dist.multiplyScalar(camPhys.maxThrust);
 
 	var a,b,c,s,area;
 	a = t1.distanceTo(t2);
@@ -177,7 +180,7 @@ function shipUpdate() {
 	var sizeOfShip = 32;
 	var radius = sizeOfShip;
 	if (goalObject.indexOf("planet") != -1) {
-		radius += scenePlanets[goalObject].radius*1.5;
+		radius += scenePlanets[goalObject].radius*radiusMultiplier;
 	}
 	
 	ship = ship[1];
@@ -186,8 +189,8 @@ function shipUpdate() {
 	var t = travelling;
 	
 		//Allow the ship to rotate planets when it's hit the target.
-	if (goal.position.clone().sub(ship.position).length() < radius*2.5) {
-		shipPhys.velocity.multiplyScalar(0.9);
+	if (goal.position.clone().sub(ship.position).length() < radius*3) {
+		shipPhys.velocity.multiplyScalar(0.66);
 	}
 	if (goal.position.clone().sub(ship.position).length() < radius)  { 
 		travelling = false;
@@ -219,7 +222,6 @@ function shipUpdate() {
 			shipPhys.velocity.multiplyScalar(0);
 		}
 		ship.position = ship.position.add(shipPhys.velocity);
-		return;
 	}
 	//
 	else if (orbiting[0] !== "none") {
@@ -239,6 +241,9 @@ function shipUpdate() {
 		ship.lookAt(ship.position.clone().add(shipPhys.velocity).add(shipPhys.acceleration));
 		ship.quaternion.slerp(tquat,0.9);
 	}
+	
+	//So the ship doesn't fly into planets...
+	redundantShipCheck(ship);
 	
 	//console.log(ship.position.distanceTo(goal.position));
 	
