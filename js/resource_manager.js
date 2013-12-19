@@ -100,7 +100,7 @@ function renderSetup() {
 	renderer.setSize(SCREEN_WIDTH, SCREEN_HEIGHT);
 	document.getElementById("ThreeJS").appendChild(renderer.domElement);
 
-	camera = new THREE.PerspectiveCamera(45, ASPECT, 0.1, 40000);
+	camera = new THREE.PerspectiveCamera(45, ASPECT, 0.1, 256000);
     camera.position.set(0,20,-10);
 	addToScene(camera,"camera");
 }
