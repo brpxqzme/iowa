@@ -9,6 +9,8 @@ var ids = []; // IDs in use (key: ID, value: array)
 var stars = []; // star systems by id
 var starx = []; // associate star x positions to star ids (easy way to sort...)
 var stary = [];
+var starxs = []; // associate positions to star x coordinates (searchable)
+var starys = [];
 var planets = []; // planets cache by id
 //var gates = []; // warp gates cache by id
 
@@ -88,7 +90,9 @@ function makeManySystems (n) {
             // horizontally lined up with each other perfectly).
             if (!exists(starx[stars[i].x]) && !exists(stary[stars[i].y])) {
                 starx[stars[i].x] = i;
+                starxs.push(stars[i].x);
                 stary[stars[i].y] = i;
+                starys.push(stars[i].y);
                 // now that that's settled, get height off disc, too
                 // this is only used for graphical niceness
                 stars[i].z = Math.round(m.randStd()*3000);

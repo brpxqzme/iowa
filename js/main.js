@@ -24,10 +24,10 @@ function addMouseEvents () {
     addEvent(document, "mousedown", function (e) {
         // update global mouse, normalize range, x+ is right, y+ is up
         mouse.x = (e.clientX / window.innerWidth) * 2 - 1;
-        mouse.y = (e.clientY / window.innerHeight) * 2 + 1;
+        mouse.y = -(e.clientY / window.innerHeight) * 2 + 1;
 
         if (mouse.x > 2/3 && mouse.y < 0) { // clicked lr area (or thereabouts)
-            minimapClicked();
+            minimapClicked(e.clientX,e.clientY);
         } else if (mouse.x < 2/3) {
             // do something in the main view?
         }
@@ -65,6 +65,7 @@ function addResizeEvent () {
 
   run = function() {
 	addKeyboardEvents();
+	addMouseEvents();
     initTextDiv();
     addResizeEvent();
     init();

@@ -21,7 +21,27 @@ function makeMap () {
     mapscn.add(mapcam);
 }
 
-// expects global mouse {x, y} filled normalized to SCREEN, not minimap
-function minimapClicked () {
-    return; // stub
+// expects SCREEN coordinates
+function minimapClicked (x, y) {
+    var mapdim = window.innerWidth/6,
+        maptop = window.innerHeight - mapdim,
+        mapleft = window.innerWidth - mapdim,
+        mx = ((x - mapleft)/mapdim)*2.0-1,
+        my = -((y - maptop)/mapdim)*2.0+1,
+        gx = mx*50000, // galactic coordinates clicked
+        gy = my*50000,
+        i, dist,
+        mindist2 = 10000000000,
+        closeid;
+    for (i in stars) {
+        dist2 = (stars[i].x-gx)*(stars[i].x-gx) +
+                (stars[i].y-gy)*(stars[i].y-gy);
+        if (dist2 < mindist2) {
+            mindist2 = dist2;
+            closeid = i;
+        }
+    }
+    // switch to system nearest to mouse click
+    switchSystem(i);
+    return;
 }

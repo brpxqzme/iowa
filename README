@@ -33,6 +33,9 @@ of objects.
 - Noise-based texture generation on celestial bodies
 - Keypress-based navigational system
 - Text-based player message notifier
+- The stars you see in the distance aren't just dots.
+  They're systems. They're really out there.
+- Minimap
 
 5. Required technique implemented:
 
