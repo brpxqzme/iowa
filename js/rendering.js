@@ -105,7 +105,7 @@ function animate() {
     renderer.render(scene, camera);
 
     // Minimap
-    renderer.setViewport(MAIN_WIDTH + 1, 0, TEXT_WIDTH, TEXT_HEIGHT);
+    renderer.setViewport(MAIN_WIDTH + 1, 0, TEXT_WIDTH, TEXT_WIDTH);
     renderer.render(mapscn, mapcam);
 
     // Viewport behind text div (just in case it's needed).
