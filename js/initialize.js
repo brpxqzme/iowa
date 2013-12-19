@@ -25,7 +25,7 @@ function switchSystem(ID) {
 function setupScene(ID,setShip) {
 	//No need to reload the ship each time we do this, that's horrible overhead.
 	if (setShip !== undefined && setShip) {
-		var ship = grabObject("spaceship")[1]; 
+		var ship = grabObject("spaceship")[1].clone(); 
 	} else { setShip = false; }
 	
 	setActiveHDR("resources/hdr/space/spacehdr-");
@@ -85,6 +85,15 @@ function setupScene(ID,setShip) {
 	}
 	if (setShip) { grabObject("spaceship")[1].position = new THREE.Vector3(sun.radius*3,25,sun.radius*-3); }
 	camera.position.set(sun.radius*3,25,sun.radius*-3);
+	
+	//...Stars!?
+    var stars_geometry = new THREE.Geometry();
+    for (var i in stars) 
+		stars_geometry.vertices.push(new THREE.Vector3(stars[i].x*12,stars[i].y*12,stars[i].z*12));
+    var stars_partmat = new THREE.ParticleBasicMaterial({ color: 0xffffff, ambient:0xffffff, size: 4 });
+    var stars_system = new THREE.ParticleSystem(stars_geometry,stars_partmat);								
+	scene.add(stars_system);
+	
 }
 
 function initSpace() {
