@@ -1,3 +1,5 @@
+None of these actually were used, mind you, just interesting effects that could be incorporated at some point in time.
+
 http://threejs.org/examples/webgl_lensflares.html
 http://threejs.org/examples/webgl_lights_hemisphere.html
 http://threejs.org/examples/webgl_postprocessing_dof.html
